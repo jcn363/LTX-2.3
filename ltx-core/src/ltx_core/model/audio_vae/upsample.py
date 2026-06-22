@@ -1,5 +1,3 @@
-from typing import Set, Tuple
-
 import torch
 
 from ltx_core.model.audio_vae.attention import AttentionType, make_attn
@@ -58,7 +56,7 @@ class Upsample(torch.nn.Module):
 def build_upsampling_path(  # noqa: PLR0913
     *,
     ch: int,
-    ch_mult: Tuple[int, ...],
+    ch_mult: tuple[int, ...],
     num_resolutions: int,
     num_res_blocks: int,
     resolution: int,
@@ -67,7 +65,7 @@ def build_upsampling_path(  # noqa: PLR0913
     norm_type: NormType,
     causality_axis: CausalityAxis,
     attn_type: AttentionType,
-    attn_resolutions: Set[int],
+    attn_resolutions: set[int],
     resamp_with_conv: bool,
     initial_block_channels: int,
 ) -> tuple[torch.nn.ModuleList, int]:

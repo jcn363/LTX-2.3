@@ -1,4 +1,4 @@
-from typing import Protocol, Tuple
+from typing import Protocol
 
 import torch
 
@@ -39,7 +39,7 @@ class Patchifier(Protocol):
         """
 
     @property
-    def patch_size(self) -> Tuple[int, int, int]:
+    def patch_size(self) -> tuple[int, int, int]:
         ...
         """
         Returns the patch size as a tuple of (temporal, height, width) dimensions
@@ -68,7 +68,7 @@ class SchedulerProtocol(Protocol):
     given number of steps. Device is cpu.
     """
 
-    def execute(self, steps: int, **kwargs) -> torch.FloatTensor: ...
+    def execute(self, steps: int, **kwargs) -> torch.Tensor: ...
 
 
 class GuiderProtocol(Protocol):

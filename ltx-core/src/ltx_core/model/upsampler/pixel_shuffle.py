@@ -24,7 +24,8 @@ class PixelShuffleND(torch.nn.Module):
 
     def __init__(self, dims: int, upscale_factors: tuple[int, int, int] = (2, 2, 2)):
         super().__init__()
-        assert dims in [1, 2, 3], "dims must be 1, 2, or 3"
+        if dims not in [1, 2, 3]:
+            raise ValueError(f"dims must be 1, 2, or 3, got {dims}")
         self.dims = dims
         self.upscale_factors = upscale_factors
 

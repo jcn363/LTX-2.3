@@ -1,1 +1,1 @@
-"""CLIP/text encoder model components."""
+"""Text encoder model components (Gemma)."""

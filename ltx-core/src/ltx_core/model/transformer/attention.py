@@ -73,17 +73,17 @@ class XFormersAttention(AttentionCallable):
                 mask = mask.unsqueeze(1)
             # pad to a multiple of 8
             pad = 8 - mask.shape[-1] % 8
-            # the xformers docs says that it's allowed to have a mask of shape (1, Nq, Nk)
-            # but when using separated heads, the shape has to be (B, H, Nq, Nk)
-            # in flux, this matrix ends up being over 1GB
-            # here, we create a mask with the same batch/head size as the input mask (potentially singleton or full)
-            mask_out = torch.empty(
-                [mask.shape[0], mask.shape[1], q.shape[1], mask.shape[-1] + pad], dtype=q.dtype, device=q.device
-            )
+            if pad != 8:
+                # the xformers docs says that it's allowed to have a mask of shape (1, Nq, Nk)
+                # but when using separated heads, the shape has to be (B, H, Nq, Nk)
+                # in flux, this matrix ends up being over 1GB
+                # here, we create a mask with the same batch/head size as the input mask (potentially singleton or full)
+                mask_out = torch.empty(
+                    [mask.shape[0], mask.shape[1], q.shape[1], mask.shape[-1] + pad], dtype=q.dtype, device=q.device
+                )
 
-            mask_out[..., : mask.shape[-1]] = mask
-            # doesn't this remove the padding again??
-            mask = mask_out[..., : mask.shape[-1]]
+                mask_out[..., : mask.shape[-1]] = mask
+                mask = mask_out
             mask = mask.expand(b, heads, -1, -1)
 
         out = memory_efficient_attention(q.to(v.dtype), k.to(v.dtype), v, attn_bias=mask, p=0.0)

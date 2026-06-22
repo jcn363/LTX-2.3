@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import torch
 from einops import rearrange
 
@@ -7,7 +5,7 @@ from ltx_core.model.upsampler.blur_downsample import BlurDownsample
 from ltx_core.model.upsampler.pixel_shuffle import PixelShuffleND
 
 
-def _rational_for_scale(scale: float) -> Tuple[int, int]:
+def _rational_for_scale(scale: float) -> tuple[int, int]:
     mapping = {0.75: (3, 4), 1.5: (3, 2), 2.0: (2, 1), 4.0: (4, 1)}
     if float(scale) not in mapping:
         raise ValueError(f"Unsupported scale {scale}. Choose from {list(mapping.keys())}")

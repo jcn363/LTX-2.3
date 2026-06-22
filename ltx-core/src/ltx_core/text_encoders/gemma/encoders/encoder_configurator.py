@@ -78,11 +78,11 @@ def _create_feature_extractor(transformer_config: dict) -> torch.nn.Module:
 
     missing_keys = _V2_EXPECTED_CONFIG.keys() - overlapping_keys
     if missing_keys:
-        raise NotImplementedError("Partial V2 config — missing keys: " + ", ".join(sorted(missing_keys)))
+        raise ValueError("Partial V2 config — missing keys: " + ", ".join(sorted(missing_keys)))
 
     unexpected_value_keys = {k for k in overlapping_keys if transformer_config[k] != _V2_EXPECTED_CONFIG[k]}
     if unexpected_value_keys:
-        raise NotImplementedError(
+        raise ValueError(
             "Unknown config: "
             + ", ".join(
                 f"{k}={transformer_config[k]!r} (expected {_V2_EXPECTED_CONFIG[k]!r})" for k in unexpected_value_keys

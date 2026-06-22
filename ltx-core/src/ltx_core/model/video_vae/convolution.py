@@ -1,5 +1,3 @@
-from typing import Tuple, Union
-
 import torch
 from einops import rearrange
 from torch import nn
@@ -9,7 +7,7 @@ from ltx_core.model.video_vae.enums import PaddingModeType
 
 
 def make_conv_nd(  # noqa: PLR0913
-    dims: Union[int, Tuple[int, int]],
+    dims: int | tuple[int, int],
     in_channels: int,
     out_channels: int,
     kernel_size: int,
@@ -23,7 +21,7 @@ def make_conv_nd(  # noqa: PLR0913
     temporal_padding_mode: PaddingModeType = PaddingModeType.ZEROS,
 ) -> nn.Module:
     if not (spatial_padding_mode == temporal_padding_mode or causal):
-        raise NotImplementedError("spatial and temporal padding modes must be equal")
+        raise ValueError("spatial and temporal padding modes must be equal")
     if dims == 2:
         return nn.Conv2d(
             in_channels=in_channels,
@@ -93,9 +91,9 @@ class DualConv3d(nn.Module):
         in_channels: int,
         out_channels: int,
         kernel_size: int,
-        stride: Union[int, Tuple[int, int, int]] = 1,
-        padding: Union[int, Tuple[int, int, int]] = 0,
-        dilation: Union[int, Tuple[int, int, int]] = 1,
+        stride: int | tuple[int, int, int] = 1,
+        padding: int | tuple[int, int, int] = 0,
+        dilation: int | tuple[int, int, int] = 1,
         groups: int = 1,
         bias: bool = True,
         padding_mode: str = "zeros",
@@ -269,7 +267,7 @@ class CausalConv3d(nn.Module):
         in_channels: int,
         out_channels: int,
         kernel_size: int = 3,
-        stride: Union[int, Tuple[int]] = 1,
+        stride: int | tuple[int] = 1,
         dilation: int = 1,
         groups: int = 1,
         bias: bool = True,

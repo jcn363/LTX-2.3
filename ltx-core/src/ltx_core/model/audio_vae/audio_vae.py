@@ -1,5 +1,3 @@
-from typing import Set, Tuple
-
 import torch
 import torch.nn.functional as F
 
@@ -67,9 +65,9 @@ class AudioEncoder(torch.nn.Module):
         self,
         *,
         ch: int,
-        ch_mult: Tuple[int, ...] = (1, 2, 4, 8),
+        ch_mult: tuple[int, ...] = (1, 2, 4, 8),
         num_res_blocks: int,
-        attn_resolutions: Set[int],
+        attn_resolutions: set[int],
         dropout: float = 0.0,
         resamp_with_conv: bool = True,
         in_channels: int,
@@ -285,7 +283,7 @@ class AudioDecoder(torch.nn.Module):
         *,
         ch: int,
         out_ch: int,
-        ch_mult: Tuple[int, ...] = (1, 2, 4, 8),
+        ch_mult: tuple[int, ...] = (1, 2, 4, 8),
         num_res_blocks: int,
         attn_resolutions: Set[int],
         resolution: int,
@@ -334,8 +332,6 @@ class AudioDecoder(torch.nn.Module):
         self.num_res_blocks = num_res_blocks
         self.resolution = resolution
         self.out_ch = out_ch
-        self.give_pre_end = False
-        self.tanh_out = False
         self.norm_type = norm_type
         self.z_channels = z_channels
         self.channel_multipliers = ch_mult
@@ -484,13 +480,10 @@ class AudioDecoder(torch.nn.Module):
         return h
 
     def _finalize_output(self, h: torch.Tensor) -> torch.Tensor:
-        if self.give_pre_end:
-            return h
-
         h = self.norm_out(h)
         h = self.non_linearity(h)
         h = self.conv_out(h)
-        return torch.tanh(h) if self.tanh_out else h
+        return h
 
 
 def decode_audio(latent: torch.Tensor, audio_decoder: "AudioDecoder", vocoder: "Vocoder") -> Audio:

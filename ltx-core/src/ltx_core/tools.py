@@ -104,9 +104,10 @@ class VideoLatentTools(LatentTools):
         initial_latent: torch.Tensor | None = None,
     ) -> LatentState:
         if initial_latent is not None:
-            assert initial_latent.shape == self.target_shape.to_torch_shape(), (
-                f"Latent shape {initial_latent.shape} does not match target shape {self.target_shape.to_torch_shape()}"
-            )
+            if initial_latent.shape != self.target_shape.to_torch_shape():
+                raise ValueError(
+                    f"Latent shape {initial_latent.shape} does not match target shape {self.target_shape.to_torch_shape()}"
+                )
         else:
             initial_latent = torch.zeros(
                 *self.target_shape.to_torch_shape(),
@@ -160,9 +161,10 @@ class AudioLatentTools(LatentTools):
         initial_latent: torch.Tensor | None = None,
     ) -> LatentState:
         if initial_latent is not None:
-            assert initial_latent.shape == self.target_shape.to_torch_shape(), (
-                f"Latent shape {initial_latent.shape} does not match target shape {self.target_shape.to_torch_shape()}"
-            )
+            if initial_latent.shape != self.target_shape.to_torch_shape():
+                raise ValueError(
+                    f"Latent shape {initial_latent.shape} does not match target shape {self.target_shape.to_torch_shape()}"
+                )
         else:
             initial_latent = torch.zeros(
                 *self.target_shape.to_torch_shape(),

@@ -430,34 +430,6 @@ class LTXModel(torch.nn.Module):
         return vx, ax
 
 
-class LegacyX0Model(torch.nn.Module):
-    """
-    Legacy X0 model implementation.
-    Returns fully denoised output based on the velocities produced by the base model.
-    """
-
-    def __init__(self, velocity_model: LTXModel):
-        super().__init__()
-        self.velocity_model = velocity_model
-
-    def forward(
-        self,
-        video: Modality | None,
-        audio: Modality | None,
-        perturbations: BatchedPerturbationConfig,
-        sigma: float,
-    ) -> tuple[torch.Tensor | None, torch.Tensor | None]:
-        """
-        Denoise the video and audio according to the sigma.
-        Returns:
-            Denoised video and audio
-        """
-        vx, ax = self.velocity_model(video, audio, perturbations)
-        denoised_video = to_denoised(video.latent, vx, sigma) if vx is not None else None
-        denoised_audio = to_denoised(audio.latent, ax, sigma) if ax is not None else None
-        return denoised_video, denoised_audio
-
-
 class X0Model(torch.nn.Module):
     """
     X0 model implementation.

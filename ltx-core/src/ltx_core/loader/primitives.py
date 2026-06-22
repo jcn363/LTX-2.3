@@ -68,10 +68,11 @@ class ModelBuilderProtocol(Protocol[ModelType]):
         """
         ...
 
-    def build(self, dtype: torch.dtype | None = None) -> ModelType:
+    def build(self, device: torch.device | None = None, dtype: torch.dtype | None = None) -> ModelType:
         """
         Build the model
         Args:
+            device: Target device for the model, if None, uses CUDA
             dtype: Target dtype for the model, if None, uses the dtype of the model_path model
         Returns:
             Model instance

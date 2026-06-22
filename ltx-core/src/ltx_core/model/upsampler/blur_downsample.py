@@ -13,11 +13,16 @@ class BlurDownsample(torch.nn.Module):
 
     def __init__(self, dims: int, stride: int, kernel_size: int = 5) -> None:
         super().__init__()
-        assert dims in (2, 3)
-        assert isinstance(stride, int)
-        assert stride >= 1
-        assert kernel_size >= 3
-        assert kernel_size % 2 == 1
+        if dims not in (2, 3):
+            raise ValueError(f"dims must be 2 or 3, got {dims}")
+        if not isinstance(stride, int):
+            raise TypeError(f"stride must be int, got {type(stride)}")
+        if stride < 1:
+            raise ValueError(f"stride must be >= 1, got {stride}")
+        if kernel_size < 3:
+            raise ValueError(f"kernel_size must be >= 3, got {kernel_size}")
+        if kernel_size % 2 != 1:
+            raise ValueError(f"kernel_size must be odd, got {kernel_size}")
         self.dims = dims
         self.stride = stride
         self.kernel_size = kernel_size

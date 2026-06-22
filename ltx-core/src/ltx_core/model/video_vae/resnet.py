@@ -1,5 +1,3 @@
-from typing import Optional, Tuple, Union
-
 import torch
 from torch import nn
 
@@ -23,9 +21,9 @@ class ResnetBlock3D(nn.Module):
 
     def __init__(
         self,
-        dims: Union[int, Tuple[int, int]],
+        dims: int | tuple[int, int],
         in_channels: int,
-        out_channels: Optional[int] = None,
+        out_channels: int | None = None,
         dropout: float = 0.0,
         groups: int = 32,
         eps: float = 1e-6,
@@ -105,7 +103,7 @@ class ResnetBlock3D(nn.Module):
         self,
         hidden_states: torch.Tensor,
         per_channel_scale: torch.Tensor,
-        generator: Optional[torch.Generator] = None,
+        generator: torch.Generator | None = None,
     ) -> torch.Tensor:
         spatial_shape = hidden_states.shape[-2:]
         device = hidden_states.device
@@ -122,8 +120,8 @@ class ResnetBlock3D(nn.Module):
         self,
         input_tensor: torch.Tensor,
         causal: bool = True,
-        timestep: Optional[torch.Tensor] = None,
-        generator: Optional[torch.Generator] = None,
+        timestep: torch.Tensor | None = None,
+        generator: torch.Generator | None = None,
     ) -> torch.Tensor:
         hidden_states = input_tensor
         batch_size = hidden_states.shape[0]
@@ -209,7 +207,7 @@ class UNetMidBlock3D(nn.Module):
 
     def __init__(
         self,
-        dims: Union[int, Tuple[int, int]],
+        dims: int | tuple[int, int],
         in_channels: int,
         dropout: float = 0.0,
         num_layers: int = 1,
@@ -252,8 +250,8 @@ class UNetMidBlock3D(nn.Module):
         self,
         hidden_states: torch.Tensor,
         causal: bool = True,
-        timestep: Optional[torch.Tensor] = None,
-        generator: Optional[torch.Generator] = None,
+        timestep: torch.Tensor | None = None,
+        generator: torch.Generator | None = None,
     ) -> torch.Tensor:
         timestep_embed = None
         if self.timestep_conditioning:

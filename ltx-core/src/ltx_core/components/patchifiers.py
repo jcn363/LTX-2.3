@@ -1,5 +1,4 @@
 import math
-from typing import Optional, Tuple
 
 import einops
 import torch
@@ -18,7 +17,7 @@ class VideoLatentPatchifier(Patchifier):
         )
 
     @property
-    def patch_size(self) -> Tuple[int, int, int]:
+    def patch_size(self) -> tuple[int, int, int]:
         return self._patch_size
 
     def get_token_count(self, tgt_shape: VideoLatentShape) -> int:
@@ -43,7 +42,8 @@ class VideoLatentPatchifier(Patchifier):
         latents: torch.Tensor,
         output_shape: VideoLatentShape,
     ) -> torch.Tensor:
-        assert self._patch_size[0] == 1, "Temporal patch size must be 1 for symmetric patchifier"
+        if self._patch_size[0] != 1:
+            raise ValueError(f"Temporal patch size must be 1 for symmetric patchifier, got {self._patch_size[0]}")
 
         patch_grid_frames = output_shape.frames // self._patch_size[0]
         patch_grid_height = output_shape.height // self._patch_size[1]
@@ -64,7 +64,7 @@ class VideoLatentPatchifier(Patchifier):
     def get_patch_grid_bounds(
         self,
         output_shape: AudioLatentShape | VideoLatentShape,
-        device: Optional[torch.device] = None,
+        device: torch.device | None = None,
     ) -> torch.Tensor:
         """
         Return the per-dimension bounds [inclusive start, exclusive end) for every
@@ -86,10 +86,14 @@ class VideoLatentPatchifier(Patchifier):
         batch_size = output_shape.batch
 
         # Validate inputs to ensure positive dimensions
-        assert frames > 0, f"frames must be positive, got {frames}"
-        assert height > 0, f"height must be positive, got {height}"
-        assert width > 0, f"width must be positive, got {width}"
-        assert batch_size > 0, f"batch_size must be positive, got {batch_size}"
+        if frames <= 0:
+            raise ValueError(f"frames must be positive, got {frames}")
+        if height <= 0:
+            raise ValueError(f"height must be positive, got {height}")
+        if width <= 0:
+            raise ValueError(f"width must be positive, got {width}")
+        if batch_size <= 0:
+            raise ValueError(f"batch_size must be positive, got {batch_size}")
 
         # Generate grid coordinates for each dimension (frame, height, width)
         # We use torch.arange to create the starting coordinates for each patch.
@@ -202,7 +206,7 @@ class AudioPatchifier(Patchifier):
         self._patch_size = (1, patch_size, patch_size)
 
     @property
-    def patch_size(self) -> Tuple[int, int, int]:
+    def patch_size(self) -> tuple[int, int, int]:
         return self._patch_size
 
     def get_token_count(self, tgt_shape: AudioLatentShape) -> int:
@@ -213,7 +217,7 @@ class AudioPatchifier(Patchifier):
         start_latent: int,
         end_latent: int,
         dtype: torch.dtype,
-        device: Optional[torch.device] = None,
+        device: torch.device | None = None,
     ) -> torch.Tensor:
         """
         Converts latent indices into real-time seconds while honoring causal
@@ -247,7 +251,7 @@ class AudioPatchifier(Patchifier):
         self,
         batch_size: int,
         num_steps: int,
-        device: Optional[torch.device] = None,
+        device: torch.device | None = None,
     ) -> torch.Tensor:
         """
         Builds a `(B, 1, T, 2)` tensor containing timestamps for each latent frame.
@@ -329,7 +333,7 @@ class AudioPatchifier(Patchifier):
     def get_patch_grid_bounds(
         self,
         output_shape: AudioLatentShape | VideoLatentShape,
-        device: Optional[torch.device] = None,
+        device: torch.device | None = None,
     ) -> torch.Tensor:
         """
         Return the temporal bounds `[inclusive start, exclusive end)` for every

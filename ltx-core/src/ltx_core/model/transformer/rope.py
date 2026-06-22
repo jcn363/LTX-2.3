@@ -1,7 +1,7 @@
 import functools
 import math
 from enum import Enum
-from typing import Callable, Tuple
+from typing import Callable
 
 import numpy as np
 import torch
@@ -15,7 +15,7 @@ class LTXRopeType(Enum):
 
 def apply_rotary_emb(
     input_tensor: torch.Tensor,
-    freqs_cis: Tuple[torch.Tensor, torch.Tensor],
+    freqs_cis: tuple[torch.Tensor, torch.Tensor],
     rope_type: LTXRopeType = LTXRopeType.INTERLEAVED,
 ) -> torch.Tensor:
     if rope_type == LTXRopeType.INTERLEAVED:
@@ -113,9 +113,10 @@ def generate_freq_grid_pytorch(
 
 def get_fractional_positions(indices_grid: torch.Tensor, max_pos: list[int]) -> torch.Tensor:
     n_pos_dims = indices_grid.shape[1]
-    assert n_pos_dims == len(max_pos), (
-        f"Number of position dimensions ({n_pos_dims}) must match max_pos length ({len(max_pos)})"
-    )
+    if n_pos_dims != len(max_pos):
+        raise ValueError(
+            f"Number of position dimensions ({n_pos_dims}) must match max_pos length ({len(max_pos)})"
+        )
     fractional_positions = torch.stack(
         [indices_grid[:, i] / max_pos[i] for i in range(n_pos_dims)],
         dim=-1,
@@ -127,8 +128,10 @@ def generate_freqs(
     indices: torch.Tensor, indices_grid: torch.Tensor, max_pos: list[int], use_middle_indices_grid: bool
 ) -> torch.Tensor:
     if use_middle_indices_grid:
-        assert len(indices_grid.shape) == 4
-        assert indices_grid.shape[-1] == 2
+        if len(indices_grid.shape) != 4:
+            raise ValueError(f"Expected indices_grid to have 4 dimensions when use_middle_indices_grid=True, got {len(indices_grid.shape)}")
+        if indices_grid.shape[-1] != 2:
+            raise ValueError(f"Expected indices_grid last dimension to be 2 when use_middle_indices_grid=True, got {indices_grid.shape[-1]}")
         indices_grid_start, indices_grid_end = indices_grid[..., 0], indices_grid[..., 1]
         indices_grid = (indices_grid_start + indices_grid_end) / 2.0
     elif len(indices_grid.shape) == 4:

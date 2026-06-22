@@ -117,11 +117,3 @@ class SDOps:
 LTXV_LORA_COMFY_RENAMING_MAP = (
     SDOps("LTXV_LORA_COMFY_PREFIX_MAP").with_matching().with_replacement("diffusion_model.", "")
 )
-
-LTXV_LORA_COMFY_TARGET_MAP = (
-    SDOps("LTXV_LORA_COMFY_TARGET_MAP")
-    .with_matching()
-    .with_replacement("diffusion_model.", "")
-    .with_replacement(".lora_A.weight", ".weight")
-    .with_replacement(".lora_B.weight", ".weight")
-)

@@ -1,6 +1,6 @@
 import itertools
 from dataclasses import dataclass
-from typing import Callable, List, NamedTuple, Tuple
+from typing import Callable, NamedTuple
 
 import torch
 
@@ -151,10 +151,10 @@ class DimensionIntervals:
             Used to create masks that fade out from 1 to 0.
     """
 
-    starts: List[int]
-    ends: List[int]
-    left_ramps: List[int]
-    right_ramps: List[int]
+    starts: list[int]
+    ends: list[int]
+    left_ramps: list[int]
+    right_ramps: list[int]
 
 
 @dataclass(frozen=True)
@@ -166,7 +166,7 @@ class TensorTilingSpec:
     """
 
     original_shape: torch.Size
-    dimension_intervals: Tuple[DimensionIntervals, ...]
+    dimension_intervals: tuple[DimensionIntervals, ...]
 
 
 # Operation to split a single dimension of the tensor into intervals based on the length along the dimension.
@@ -207,14 +207,14 @@ class Tile(NamedTuple):
             Create a single N-D mask from the per-dimension masks.
     """
 
-    in_coords: Tuple[slice, ...]
-    out_coords: Tuple[slice, ...]
-    masks_1d: Tuple[Tuple[torch.Tensor, ...]]
+    in_coords: tuple[slice, ...]
+    out_coords: tuple[slice, ...]
+    masks_1d: tuple[tuple[torch.Tensor, ...]]
 
     @property
     def blend_mask(self) -> torch.Tensor:
         num_dims = len(self.out_coords)
-        per_dimension_masks: List[torch.Tensor] = []
+        per_dimension_masks: list[torch.Tensor] = []
 
         for dim_idx in range(num_dims):
             mask_1d = self.masks_1d[dim_idx]
@@ -241,8 +241,8 @@ class Tile(NamedTuple):
 
 def create_tiles_from_intervals_and_mappers(
     intervals: TensorTilingSpec,
-    mappers: List[MappingOperation],
-) -> List[Tile]:
+    mappers: list[MappingOperation],
+) -> list[Tile]:
     full_dim_input_slices = []
     full_dim_output_slices = []
     full_dim_masks_1d = []
@@ -273,9 +273,9 @@ def create_tiles_from_intervals_and_mappers(
 
 def create_tiles(
     tensor_shape: torch.Size,
-    splitters: List[SplitOperation],
-    mappers: List[MappingOperation],
-) -> List[Tile]:
+    splitters: list[SplitOperation],
+    mappers: list[MappingOperation],
+) -> list[Tile]:
     if len(splitters) != len(tensor_shape):
         raise ValueError(
             f"Number of splitters must be equal to number of dimensions in tensor shape, "

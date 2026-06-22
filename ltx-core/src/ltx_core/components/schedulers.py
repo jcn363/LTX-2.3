@@ -28,7 +28,7 @@ class LTX2Scheduler(SchedulerProtocol):
         terminal: float = 0.1,
         default_number_of_tokens: int = MAX_SHIFT_ANCHOR,
         **_kwargs,
-    ) -> torch.FloatTensor:
+    ) -> torch.Tensor:
         tokens = math.prod(latent.shape[2:]) if latent is not None else default_number_of_tokens
         sigmas = torch.linspace(1.0, 0.0, steps + 1)
 
@@ -66,9 +66,9 @@ class LinearQuadraticScheduler(SchedulerProtocol):
 
     def execute(
         self, steps: int, threshold_noise: float = 0.025, linear_steps: int | None = None, **_kwargs
-    ) -> torch.FloatTensor:
+    ) -> torch.Tensor:
         if steps == 1:
-            return torch.FloatTensor([1.0, 0.0])
+            return torch.tensor([1.0, 0.0])
 
         if linear_steps is None:
             linear_steps = steps // 2
@@ -85,7 +85,7 @@ class LinearQuadraticScheduler(SchedulerProtocol):
             ]
         sigma_schedule = linear_sigma_schedule + quadratic_sigma_schedule + [1.0]
         sigma_schedule = [1.0 - x for x in sigma_schedule]
-        return torch.FloatTensor(sigma_schedule)
+        return torch.tensor(sigma_schedule)
 
 
 class BetaScheduler(SchedulerProtocol):
@@ -97,7 +97,7 @@ class BetaScheduler(SchedulerProtocol):
     shift = 2.37
     timesteps_length = 10000
 
-    def execute(self, steps: int, alpha: float = 0.6, beta: float = 0.6) -> torch.FloatTensor:
+    def execute(self, steps: int, alpha: float = 0.6, beta: float = 0.6) -> torch.Tensor:
         """
         Execute the beta scheduler.
         Args:
@@ -117,7 +117,7 @@ class BetaScheduler(SchedulerProtocol):
         ts = list(dict.fromkeys(ts))
 
         sigmas = [float(model_sampling_sigmas[int(t)]) for t in ts] + [0.0]
-        return torch.FloatTensor(sigmas)
+        return torch.tensor(sigmas)
 
 
 @lru_cache(maxsize=5)

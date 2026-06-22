@@ -1,5 +1,3 @@
-from typing import Optional, Tuple
-
 import torch
 
 from ltx_core.model.transformer.timestep_embedding import PixArtAlphaCombinedTimestepSizeEmbeddings
@@ -39,7 +37,7 @@ class AdaLayerNormSingle(torch.nn.Module):
     def forward(
         self,
         timestep: torch.Tensor,
-        hidden_dtype: Optional[torch.dtype] = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        hidden_dtype: torch.dtype | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         embedded_timestep = self.emb(timestep, hidden_dtype=hidden_dtype)
         return self.linear(self.silu(embedded_timestep)), embedded_timestep

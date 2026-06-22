@@ -29,7 +29,8 @@ def get_timestep_embedding(
     Returns
         torch.Tensor: an [N x dim] Tensor of positional embeddings.
     """
-    assert len(timesteps.shape) == 1, "Timesteps should be a 1d-array"
+    if len(timesteps.shape) != 1:
+        raise ValueError(f"Timesteps should be a 1d-array, got shape {timesteps.shape}")
 
     half_dim = embedding_dim // 2
     exponent = -math.log(max_period) * torch.arange(start=0, end=half_dim, dtype=torch.float32, device=timesteps.device)
@@ -80,6 +81,8 @@ class TimestepEmbedding(torch.nn.Module):
 
         if post_act_fn is None:
             self.post_act = None
+        else:
+            self.post_act = getattr(torch.nn, post_act_fn)()
 
     def forward(self, sample: torch.Tensor, condition: torch.Tensor | None = None) -> torch.Tensor:
         if condition is not None:

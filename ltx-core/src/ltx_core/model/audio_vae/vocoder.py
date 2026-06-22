@@ -1,5 +1,4 @@
 import math
-from typing import List
 
 import einops
 import torch
@@ -294,10 +293,10 @@ class Vocoder(torch.nn.Module):
 
     def __init__(  # noqa: PLR0913
         self,
-        resblock_kernel_sizes: List[int] | None = None,
-        upsample_rates: List[int] | None = None,
-        upsample_kernel_sizes: List[int] | None = None,
-        resblock_dilation_sizes: List[List[int]] | None = None,
+        resblock_kernel_sizes: list[int] | None = None,
+        upsample_rates: list[int] | None = None,
+        upsample_kernel_sizes: list[int] | None = None,
+        resblock_dilation_sizes: list[list[int]] | None = None,
         upsample_initial_channel: int = 1024,
         resblock: str = "1",
         output_sampling_rate: int = 24000,
@@ -386,7 +385,8 @@ class Vocoder(torch.nn.Module):
         x = x.transpose(2, 3)  # (batch, channels, time, mel_bins) -> (batch, channels, mel_bins, time)
 
         if x.dim() == 4:  # stereo
-            assert x.shape[1] == 2, "Input must have 2 channels for stereo"
+            if x.shape[1] != 2:
+                raise ValueError(f"Input must have 2 channels for stereo, got {x.shape[1]}")
             x = einops.rearrange(x, "b s c t -> b (s c) t")
 
         x = self.conv_pre(x)
@@ -570,6 +570,7 @@ class VocoderWithBWE(nn.Module):
         mel_for_bwe = mel.transpose(2, 3)  # (B, C, T_frames, mel_bins)
         residual = self.bwe_generator(mel_for_bwe)
         skip = self.resampler(x)
-        assert residual.shape == skip.shape, f"residual {residual.shape} != skip {skip.shape}"
+        if residual.shape != skip.shape:
+            raise ValueError(f"residual {residual.shape} != skip {skip.shape}")
 
         return torch.clamp(residual + skip, -1, 1)[..., :output_length]
